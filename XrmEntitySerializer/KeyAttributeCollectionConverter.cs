@@ -1,4 +1,5 @@
-﻿using Microsoft.Xrm.Sdk;
+﻿#if !XRM_7 && !XRM_6 && !XRM_5
+using Microsoft.Xrm.Sdk;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -6,7 +7,6 @@ using System.Collections.Generic;
 
 namespace XrmEntitySerializer
 {
-#if !XRM_7 && !XRM_6 && !XRM_5
     public class KeyAttributeCollectionConverter : CollectionTypeConverter<KeyAttributeCollection>
     {
         protected override KeyAttributeCollection ReadCollection(JsonReader reader, Type objectType, KeyAttributeCollection existingKeyAttributes, JsonSerializer serializer, JArray jArray)
@@ -34,7 +34,7 @@ namespace XrmEntitySerializer
                 serializer.Serialize(writer, attribute.Value);
                 writer.WriteEndObject();
             }
-        }
+        }      
     }
-#endif
 }
+#endif

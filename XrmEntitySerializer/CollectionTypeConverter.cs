@@ -19,26 +19,35 @@ namespace XrmEntitySerializer
         {
             T result = default(T);
             bool parsed = false;
-            for (int i = 0; i < 2; i++)
+            if (reader.TokenType == JsonToken.StartArray)
             {
-                reader.Read();
-                if (reader.TokenType == JsonToken.PropertyName && (string)reader.Value == "$value")
-                {
-                    reader.Read();
-                    JArray jArray = JArray.Load(reader);
-                    result = ReadCollection(reader, objectType, (T)existingValue, serializer, jArray);
-                    parsed = true;
-                }
-                else
-                {
-                    reader.Read();
-                }
+                JArray jArray = JArray.Load(reader);
+                result = ReadCollection(reader, objectType, (T)existingValue, serializer, jArray);
             }
 
-            reader.Read();
-            if (!parsed)
+            else
             {
-                throw new JsonSerializationException("Could not find a property $value");
+                for (int i = 0; i < 2; i++)
+                {
+                    reader.Read();
+                    if (reader.TokenType == JsonToken.PropertyName && (string)reader.Value == "$value")
+                    {
+                        reader.Read();
+                        JArray jArray = JArray.Load(reader);
+                        result = ReadCollection(reader, objectType, (T)existingValue, serializer, jArray);
+                        parsed = true;
+                    }
+                    else
+                    {
+                        reader.Read();
+                    }
+                }
+
+                reader.Read();
+                if (!parsed)
+                {
+                    throw new JsonSerializationException("Could not find a property $value");
+                }
             }
             return result;
         }
